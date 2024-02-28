@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Domine-Bold.ttf",
+      "sha1": "b75d4fb4cd829cc6678b318cc9ecea23b57815d8"
+    },
+    {
+      "path": "assets/fonts/Domine-Medium.ttf",
+      "sha1": "a5f33da7991e9b2d4400e5d8927c43b71538732d"
+    },
+    {
+      "path": "assets/fonts/Domine-Regular.ttf",
+      "sha1": "f59ebc0860ab064e389844e8cedb2990018bb7d6"
+    },
+    {
+      "path": "assets/fonts/Domine-SemiBold.ttf",
+      "sha1": "5bfcf8e7b3a8e5b16ab912cae738dbc4b2516213"
+    },
+    {
+      "path": "assets/fonts/NunitoSans_7pt-Bold.ttf",
+      "sha1": "9bac6650ac507968089985e02ba424a84b27ab12"
+    },
+    {
+      "path": "assets/fonts/NunitoSans_7pt-ExtraLight.ttf",
+      "sha1": "fb6a9c99110dd77d843d96599cf82f33f693afbc"
+    },
+    {
+      "path": "assets/fonts/NunitoSans_7pt-Light.ttf",
+      "sha1": "794c5e24d84a89ac9796eda2a4ba770f865598fc"
+    },
+    {
+      "path": "assets/fonts/NunitoSans_7pt-Regular.ttf",
+      "sha1": "466635ba024c43f741e320148a159557fd732ec0"
+    }
+  ]
+}

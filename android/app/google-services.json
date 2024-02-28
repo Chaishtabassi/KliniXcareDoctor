@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1046426294507",
+    "project_id": "klinixcare",
+    "storage_bucket": "klinixcare.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046426294507:android:60ca14687ff853164546ae",
+        "android_client_info": {
+          "package_name": "com.klinixcare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaLoVZkE6gv0lD6Afq08Ur69DqcQkjSAM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
