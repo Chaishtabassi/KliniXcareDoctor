@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Backbutton from '../../Component/Backbutton';
 
 const Patientrecords = ({ navigation }) => {
   const [patientHistory, setPatientHistory] = useState([]);
@@ -21,7 +22,7 @@ const Patientrecords = ({ navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/fetchPatientHistory';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/fetchPatientHistory';
       const authToken = bearerToken;
 
       const formData = new FormData();
@@ -63,13 +64,7 @@ const Patientrecords = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackButtonPress} style={{ marginLeft: 10 }}>
-          <Image
-            resizeMode="contain"
-            style={styles.backButton}
-            source={require('../../Assets/BackButton.png')}
-          />
-        </TouchableOpacity>
+       <Backbutton/>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Patients History</Text>
         </View>

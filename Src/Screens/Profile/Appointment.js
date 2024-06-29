@@ -31,7 +31,7 @@ const Appointment = ({navigation}) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/fetchAppointmentHistory`;
+      const api = `https://espinarealty.com/doctor/api/v1/fetchAppointmentHistory`;
 
       const authToken = bearerToken;
 
@@ -131,10 +131,10 @@ const Appointment = ({navigation}) => {
       <View
         style={{
           alignItems: 'flex-end',
-          backgroundColor: '#fad6d6',
+          backgroundColor: '#4e93e1',
           padding: 10,
         }}>
-        <Text style={{fontSize: 18, fontWeight: '600'}}>
+        <Text style={{fontSize: 18, fontWeight: '600',color:'white'}}>
           {getStatusDescription(item.status)}
         </Text>
       </View>
@@ -150,7 +150,8 @@ const Appointment = ({navigation}) => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity
+          <Backbutton/>
+        {/* <TouchableOpacity
           onPress={handleBackButtonPress}
           style={{marginLeft: 10}}>
           <TouchableOpacity onPress={handleBackButtonPress}>
@@ -164,7 +165,7 @@ const Appointment = ({navigation}) => {
               }}
               source={require('../../Assets/BackButton.png')}></Image>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View
           style={{
             height: height * 0.08,

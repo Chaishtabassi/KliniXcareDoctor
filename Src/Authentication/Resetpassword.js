@@ -27,7 +27,7 @@ const Resetpassword = ({navigation, route}) => {
     const access_token = await AsyncStorage.getItem('access_token');
 
     try {
-      const apiUrl = `http://teleforceglobal.com/doctor/api/v1/setPin`;
+      const apiUrl = `https://espinarealty.com/doctor/api/v1/setPin`;
 
       const formData = new FormData();
 

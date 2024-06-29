@@ -21,10 +21,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-toast-message';
 import RNFetchBlob from 'rn-fetch-blob';
-import { RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
+import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 const Medicalprescription = ({ route, navigation }) => {
-  const richText = useRef();
+  const richText = useRef(null);
   const selectedpatien = route.params ? route.params.selectedpatien : null;
 
   const handleBackButtonPress = () => {
@@ -34,6 +34,8 @@ const Medicalprescription = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       getprescription();
+      fetchMedicineCategories();
+      fetchDoseIntervals()
     }, []),
   );
 
@@ -63,7 +65,7 @@ const Medicalprescription = ({ route, navigation }) => {
 
   const getprescription = async () => {
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/getPrescription';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/getPrescription';
       const access_token = await AsyncStorage.getItem('access_token');
       console.log(access_token)
       const authToken = access_token;
@@ -100,7 +102,7 @@ const Medicalprescription = ({ route, navigation }) => {
           setassessment(prescriptionData.assessment);
           setsummary(prescriptionData.summary)
           setcertificate(prescriptionData.medical_certificate);
-          setInstruction(prescriptionData.instructions)
+          setInstruction(richText.current?.setContentHTML(prescriptionData.instructions))
 
           console.log('dataaaaaaaaaaaaaaaaaaaaaaaaaaaa', prescriptionData)
 
@@ -123,7 +125,7 @@ const Medicalprescription = ({ route, navigation }) => {
 
   const Printprescription = async () => {
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/printPrescription';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/printPrescription';
       const access_token = await AsyncStorage.getItem('access_token');
       console.log(access_token)
       const authToken = access_token;
@@ -190,7 +192,7 @@ const Medicalprescription = ({ route, navigation }) => {
   const editprescription = async (prescriptionId) => {
     console.log('idddddddddddddddddddddddddd', prescriptionId)
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/editPrescription';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/editPrescription';
 
       const prescriptionsArray = prescriptionData.prescription_details.map(prescription => ({
         category_id: prescription.category.id,
@@ -215,6 +217,7 @@ const Medicalprescription = ({ route, navigation }) => {
       formData.append('summmary', summary);
       formData.append('assessment', assessment);
       formData.append('instructions', Instruction)
+      // formData.append('other_medicines', Othermed)
 
       console.log('inst', formData);
 
@@ -259,7 +262,7 @@ const Medicalprescription = ({ route, navigation }) => {
   const deleteprescription = async () => {
     console.log('eeeeeeeeeeeeeeeeeeeeee', prescriptionData)
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/deletePrescription';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/deletePrescription';
       const access_token = await AsyncStorage.getItem('access_token');
       const authToken = access_token;
       const formData = new FormData();
@@ -300,10 +303,11 @@ const Medicalprescription = ({ route, navigation }) => {
   const [assessment, setassessment] = useState('');
   const [certificate, setcertificate] = useState('');
   const [Instruction, setInstruction] = useState('');
+  const [Othermed, setothermed] = useState('');
 
   const PrintMediacl = async (prescriptionId) => {
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/printMedicalCertificate';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/printMedicalCertificate';
       const access_token = await AsyncStorage.getItem('access_token');
       const authToken = access_token;
       const formData = new FormData();
@@ -356,7 +360,7 @@ const Medicalprescription = ({ route, navigation }) => {
 
   const printinstruction = async (prescriptionId) => {
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/printInstruction';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/printInstruction';
       const access_token = await AsyncStorage.getItem('access_token');
       const authToken = access_token;
       const formData = new FormData();
@@ -422,20 +426,19 @@ const Medicalprescription = ({ route, navigation }) => {
   const [insturction, setinsturction] = useState([]);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [prescriptionData, setPrescriptionData] = useState([]);
+  const [Dosageother, setdosageother] = useState('');
+  const [Doseinterval, setDoseinterval] = useState('');
+  const [Doseduration, setDoseduration] = useState('');
+
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  useEffect(() => {
-    fetchMedicineCategories();
-    fetchDoseIntervals()
-  }, []);
-
   const fetchMedicineCategories = async () => {
     try {
       const access_token = await AsyncStorage.getItem('access_token');
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/fetchmedicineCategories';
+      const apiUrl = 'https://espinarealty.com/doctor/api/fetchmedicineCategories';
       const authToken = access_token;
 
       const response = await fetch(apiUrl, {
@@ -450,7 +453,6 @@ const Medicalprescription = ({ route, navigation }) => {
         console.log(data);
         setMedicines(data.category);
 
-        // Assuming dose interval and dose duration are present in the API response
         setDoseIntervals(data.dose_interval);
         setDoseDurations(data.dose_duration);
       } else {
@@ -461,9 +463,144 @@ const Medicalprescription = ({ route, navigation }) => {
     }
   };
 
+  const othermedicine = async (selectedMedicineId) => {
+    try {
+      const apiUrl = `https://espinarealty.com/doctor/api/v1/addMedicine`;
+      const access_token = await AsyncStorage.getItem('access_token');
+      const authToken = access_token;
+
+      const formData = new FormData();
+
+      formData.append('category', selectedMedicineId.id);
+      formData.append('name', Othermed);
+
+      console.log('enterrrrrrrrerrrr', selectedMedicineId.id)
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('otherrrrrrrrrrrrrrrr:', data);
+        setmedicine(prevMedicines => [...prevMedicines, { id: data.id, name: Othermed }]);
+        setOtherMedicineModalVisible(false)
+      } else {
+        throw new Error('Failed to fetch dose intervals');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const otherdosage = async (selectedMedicineId) => {
+    try {
+      const apiUrl = `https://espinarealty.com/doctor/api/v1/addDosage`;
+      const access_token = await AsyncStorage.getItem('access_token');
+      const authToken = access_token;
+
+      const formData = new FormData();
+
+      formData.append('medicine_category', selectedMedicineId.id);
+      formData.append('dose', Dosageother);
+
+      console.log('enterrrrrrrrerrrr', selectedMedicineId.id)
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('otherrrrrrrrrrrrrrrr:', data);
+        setDosages(prevDosages => [...prevDosages, { id: data.id, dosage: Dosageother }]);
+
+        setOtherdosage(false)
+      } else {
+        throw new Error('Failed to fetch dose intervals');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const otherdoseduration = async () => {
+    try {
+      const apiUrl = `https://espinarealty.com/doctor/api/v1/addDoseDuration`;
+      const access_token = await AsyncStorage.getItem('access_token');
+      const authToken = access_token;
+
+      const formData = new FormData();
+
+      formData.append('doseDuration', Doseduration);
+
+      console.log('enterrrrrrrrerrrr', selectedMedicineId.id)
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('otherrrrrrrrrrrrrrrr:', data);
+        setDoseDurations(prevDoseDurations => [...prevDoseDurations, { id: data.id, name: Doseduration }]);
+        setOtherdosageduration(false)
+      } else {
+        throw new Error('Failed to fetch dose intervals');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const otherdoseinterval = async () => {
+    try {
+      const apiUrl = `https://espinarealty.com/doctor/api/v1/addDoseInterval`;
+      const access_token = await AsyncStorage.getItem('access_token');
+      const authToken = access_token;
+
+      const formData = new FormData();
+
+      formData.append('doseInterval', Doseinterval);
+
+      console.log('enterrrrrrrrerrrr', selectedMedicineId.id)
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('otherrrrrrrrrrrrrrrr:', data);
+        setDoseIntervals(prevDoseIntervals => [...prevDoseIntervals, { id: data.id, name: Doseinterval }]);
+        setOtherdosageinterval(false)
+      } else {
+        throw new Error('Failed to fetch dose intervals');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchDoseIntervals = async (categoryId) => {
     try {
-      const apiUrl = `http://teleforceglobal.com/doctor/api/fetchMidicineslist`;
+      const apiUrl = `https://espinarealty.com/doctor/api/fetchMidicineslist`;
       const access_token = await AsyncStorage.getItem('access_token');
       const authToken = access_token;
 
@@ -482,8 +619,10 @@ const Medicalprescription = ({ route, navigation }) => {
       if (response.status === 200) {
         const data = await response.json();
         console.log('Dose intervals:', data);
-        setmedicine(data.medicines)
-        setDosages(data.medicine_dosage);
+        const dosagesWithOther = [...data.medicine_dosage, { id: 'other', dosage: 'Other' }];
+
+        setmedicine(data.medicines);
+        setDosages(dosagesWithOther);
       } else {
         throw new Error('Failed to fetch dose intervals');
       }
@@ -512,6 +651,7 @@ const Medicalprescription = ({ route, navigation }) => {
       doseDuration_id: selectedDoseDuration,
       instruction: insturction,
     };
+
     setPrescriptions([...prescriptions, newPrescription]);
 
     setSelectedMedicine(null);
@@ -524,9 +664,11 @@ const Medicalprescription = ({ route, navigation }) => {
     toggleModal();
   };
 
+
+
   const submit = async () => {
     try {
-      const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/addPrescription';
+      const apiUrl = 'https://espinarealty.com/doctor/api/v1/addPrescription';
 
       const prescriptionsArray = prescriptions.map(prescription => ({
         category_id: prescription.category_id.id,
@@ -550,6 +692,9 @@ const Medicalprescription = ({ route, navigation }) => {
       formData.append('summary', summary);
       formData.append('assessment', assessment);
       formData.append('instructions', Instruction)
+      // formData.append('other_medicines', Othermed)
+
+      console.log('instructions', Instruction)
 
       // formData.append('summmary',String(summary));
       // formData.append('summary', "summary");
@@ -557,6 +702,7 @@ const Medicalprescription = ({ route, navigation }) => {
       // formData.append('assessment', String(assessment));
 
       console.log(formData);
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -596,10 +742,35 @@ const Medicalprescription = ({ route, navigation }) => {
   };
 
 
-  useEffect(() => {
-    // Set the HTML content into RichEditor when the instructions prop changes
-    richText.current?.setContentHTML(Instruction);
-  }, [Instruction]);
+  // useEffect(() => {
+  //   richText.current?.setContentHTML(Instruction);
+  // }, [(Instruction)]);
+
+  const handleInstructionChange = (html) => {
+    console.log('contenttttt', html)
+    setInstruction(html);
+  };
+
+  const [isOtherMedicineModalVisible, setOtherMedicineModalVisible] = useState(false);
+  const [isOtherdosage, setOtherdosage] = useState(false);
+  const [isOtherdosageinterval, setOtherdosageinterval] = useState(false);
+  const [isOtherdosageduration, setOtherdosageduration] = useState(false);
+
+  const Modalother = () => {
+    setOtherMedicineModalVisible(!isOtherMedicineModalVisible);
+  };
+
+  const Modalotherdosage = () => {
+    setOtherdosage(!isOtherdosage);
+  };
+
+  const Modalotherdosageinterval = () => {
+    setOtherdosageinterval(!isOtherdosageinterval);
+  };
+
+  const Modalotherdosageduration = () => {
+    setOtherdosageduration(!isOtherdosageduration);
+  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -710,11 +881,12 @@ const Medicalprescription = ({ route, navigation }) => {
           )}
         </View>
 
+
         {isLoading ? (
           <Text>Loading...</Text>
-        ) : (
+        ) : prescriptionData?.prescription_details && prescriptionData.prescription_details.length > 0 ? (
           <FlatList
-            data={prescriptionData?.prescription_details || []}
+            data={prescriptionData.prescription_details}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={{ margin: 10, backgroundColor: '#f4f4f4' }}>
@@ -732,24 +904,27 @@ const Medicalprescription = ({ route, navigation }) => {
               </View>
             )}
           />
+        ) : (
+          <Text>No prescription is there </Text>
         )}
 
 
-        {prescriptions && prescriptions.length > 0 && prescriptions.map((scription, index) => (
-          <View style={{ margin: 10, backgroundColor: '#f4f4f4', }} key={index}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <View style={{ marginLeft: 10 }}>
-                <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>{scription.medicine_id.name}</Text>
-                <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.doseInterval_id.name}</Text>
-                <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.doseDuration_id.name}</Text>
-                <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.instruction}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.dosage_id.dosage}</Text>
-              </View>
-            </View>
-          </View>
-        ))}
+        {/* {prescriptions && prescriptions.length > 0 && prescriptions.map((scription, index) => (
+  <View style={{ margin: 10, backgroundColor: '#f4f4f4' }} key={index}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{ marginLeft: 10 }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>{scription.medicine_id?.name}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.doseInterval_id.name}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.doseDuration_id.name}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.instruction}</Text>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+        <Text style={{ fontSize: 15, fontWeight: '600' }}>{scription.dosage_id.dosage}</Text>
+      </View>
+    </View>
+  </View>
+))}
+
 
         {submissionSuccess ? (
           <TouchableOpacity onPress={toggleModal}
@@ -824,6 +999,8 @@ const Medicalprescription = ({ route, navigation }) => {
                       fontWeight: '400',
                       color: 'black',
                     }}
+                    search
+                    searchPlaceholder="Search..."
                     data={medicines}
                     labelField="name"
                     valueField="id"
@@ -846,13 +1023,24 @@ const Medicalprescription = ({ route, navigation }) => {
                       fontWeight: '400',
                       color: 'black',
                     }}
-                    data={medicine}
+                    search
+                    data={[...medicine, { id: 'other', name: 'Other' }]}
+                    searchPlaceholder="Search..."
                     labelField="name"
                     valueField="id"
                     placeholder="Select"
                     value={selectedMedicines}
-                    onChange={(value) => setSelectedMedicines(value)}
+                    onChange={(value) => {
+                      console.log(value);
+                      if (value.id === 'other') {
+                        setOtherMedicineModalVisible(true);
+                        setSelectedMedicines(null);
+                      } else {
+                        setSelectedMedicines(value);
+                      }
+                    }}
                   />
+
 
                   <Text style={{ fontSize: 16, fontWeight: '700', color: 'black' }}>
                     Dosage
@@ -869,12 +1057,23 @@ const Medicalprescription = ({ route, navigation }) => {
                       fontWeight: '400',
                       color: 'black',
                     }}
+                    search
+                    searchPlaceholder="Search..."
                     data={dosages}
                     labelField="dosage"
                     valueField="id"
                     placeholder="Select"
                     value={selectedDosage}
-                    onChange={(value) => setSelectedDosage(value)}
+
+                    onChange={(value) => {
+                      console.log(value);
+                      if (value.id === 'other') {
+                        setOtherdosage(true);
+                        setSelectedMedicines(null);
+                      } else {
+                        setSelectedDosage(value);
+                      }
+                    }}
                   />
 
 
@@ -893,12 +1092,22 @@ const Medicalprescription = ({ route, navigation }) => {
                       fontWeight: '400',
                       color: 'black',
                     }}
-                    data={doseIntervals}
+                    search
+                    searchPlaceholder="Search..."
+                    data={[...doseIntervals, { id: 'other', name: 'Other' }]}
                     labelField="name"
                     valueField="id"
                     placeholder="Select"
                     value={selectedDoseInterval}
-                    onChange={(value) => setSelectedDoseInterval(value)}
+                    onChange={(value) => {
+                      console.log(value);
+                      if (value.id === 'other') {
+                        setOtherdosageinterval(true);
+                        setSelectedMedicines(null);
+                      } else {
+                        setSelectedDoseInterval(value);
+                      }
+                    }}
                   />
 
                   <Text style={{ fontSize: 16, fontWeight: '700', color: 'black' }}>
@@ -916,12 +1125,22 @@ const Medicalprescription = ({ route, navigation }) => {
                       fontWeight: '400',
                       color: 'black',
                     }}
-                    data={doseDurations}
+                    search
+                    searchPlaceholder="Search..."
+                    data={[...doseDurations, { id: 'other', name: 'Other' }]}
                     labelField="name"
                     valueField="id"
                     placeholder="Select"
                     value={selectedDoseDuration}
-                    onChange={(value) => setSelectedDoseDuration(value)}
+                    onChange={(value) => {
+                      console.log(value);
+                      if (value.id === 'other') {
+                        setOtherdosageduration(true);
+                        setSelectedMedicines(null);
+                      } else {
+                        setSelectedDoseDuration(value);
+                      }
+                    }}
                   />
 
                   <View>
@@ -948,6 +1167,243 @@ const Medicalprescription = ({ route, navigation }) => {
             </View>
           </View>
         </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isOtherMedicineModalVisible}
+        >
+          <View style={styles.modalContainerother}>
+            <View style={styles.modalContentother}>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: '800',
+                    color: 'black',
+                    fontFamily: 'NunitoSans_7pt-Bold',
+                  }}>
+                  Add Medicine
+                </Text>
+                <TouchableOpacity
+                  onPress={Modalother}
+                  style={{
+                    backgroundColor: '#deeefd',
+                    borderRadius: 20,
+                    padding: 5,
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    style={{
+                      height: height * 0.02,
+                      width: width * 0.03,
+                      marginTop: 1,
+                    }}
+                    source={require('./Assets/CloseIcon.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Other Medicine"
+                mode="outlined"
+                outlineColor="#e4efff"
+                onChangeText={setothermed}
+                value={Othermed}
+                multiline
+                placeholderTextColor={'black'}
+                theme={{ colors: { primary: '#478ffd' } }}
+              />
+
+              <TouchableOpacity style={styles.buttons} onPress={() => othermedicine(selectedMedicineId)}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isOtherdosage}
+        >
+          <View style={styles.modalContainerother}>
+            <View style={styles.modalContentother}>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: '800',
+                    color: 'black',
+                    fontFamily: 'NunitoSans_7pt-Bold',
+                  }}>
+                  Add Dosage
+                </Text>
+                <TouchableOpacity
+                  onPress={Modalotherdosage}
+                  style={{
+                    backgroundColor: '#deeefd',
+                    borderRadius: 20,
+                    padding: 5,
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    style={{
+                      height: height * 0.02,
+                      width: width * 0.03,
+                      marginTop: 1,
+                    }}
+                    source={require('./Assets/CloseIcon.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Other Medicine"
+                mode="outlined"
+                outlineColor="#e4efff"
+                onChangeText={setdosageother}
+                value={Dosageother}
+                multiline
+                placeholderTextColor={'black'}
+                theme={{ colors: { primary: '#478ffd' } }}
+              />
+
+              <TouchableOpacity style={styles.buttons} onPress={() => otherdosage(selectedMedicineId)}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isOtherdosageinterval}
+        >
+          <View style={styles.modalContainerother}>
+            <View style={styles.modalContentother}>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: '800',
+                    color: 'black',
+                    fontFamily: 'NunitoSans_7pt-Bold',
+                  }}>
+                  Add Dose Interval
+                </Text>
+                <TouchableOpacity
+                  onPress={Modalotherdosageinterval}
+                  style={{
+                    backgroundColor: '#deeefd',
+                    borderRadius: 20,
+                    padding: 5,
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    style={{
+                      height: height * 0.02,
+                      width: width * 0.03,
+                      marginTop: 1,
+                    }}
+                    source={require('./Assets/CloseIcon.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Other Medicine"
+                mode="outlined"
+                outlineColor="#e4efff"
+                onChangeText={setDoseinterval}
+                value={Doseinterval}
+                multiline
+                placeholderTextColor={'black'}
+                theme={{ colors: { primary: '#478ffd' } }}
+              />
+
+              <TouchableOpacity style={styles.buttons} onPress={() => otherdoseinterval()}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isOtherdosageduration}
+        >
+          <View style={styles.modalContainerother}>
+            <View style={styles.modalContentother}>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: '800',
+                    color: 'black',
+                    fontFamily: 'NunitoSans_7pt-Bold',
+                  }}>
+                  Add Dose Duration
+                </Text>
+                <TouchableOpacity
+                  onPress={Modalotherdosageduration}
+                  style={{
+                    backgroundColor: '#deeefd',
+                    borderRadius: 20,
+                    padding: 5,
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    style={{
+                      height: height * 0.02,
+                      width: width * 0.03,
+                      marginTop: 1,
+                    }}
+                    source={require('./Assets/CloseIcon.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Other Medicine"
+                mode="outlined"
+                outlineColor="#e4efff"
+                onChangeText={setDoseduration}
+                value={Doseduration}
+                multiline
+                placeholderTextColor={'black'}
+                theme={{ colors: { primary: '#478ffd' } }}
+              />
+
+              <TouchableOpacity style={styles.buttons} onPress={() => otherdoseduration()}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
 
         <View style={{ margin: 10 }}>
           <View style={{ flexDirection: 'column' }}>
@@ -1020,27 +1476,24 @@ const Medicalprescription = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
             <RichEditor
-
               ref={richText}
-              // onChange={(text) => setInstruction(text)}
+              onChange={handleInstructionChange}
               placeholder="Instruction"
-              initialContentHTML={Instruction}
+              // initialContentHTML={prescriptionData.instructions} 
               androidHardwareAccelerationDisabled={true}
               style={[styles.input, styles.richTextEditorStyle]}
               initialHeight={250}
             />
-            {/* <TextInput
-              style={styles.input}
-              placeholder="Instruction"
-              mode="outlined"
-              outlineColor="#e4efff"
-              onChangeText={setInstruction}
-              value={Instruction}
-              multiline
-              placeholderTextColor={'black'}
-              theme={{ colors: { primary: '#478ffd' } }}
-            /> */}
-            <RichToolbar getEditor={() => richText.current} />
+            <RichToolbar editor={richText} actions={[
+              actions.insertImage,
+              actions.setBold,
+              actions.setItalic,
+              actions.insertBulletsList,
+              actions.insertOrderedList,
+              actions.insertLink,
+              actions.setStrikethrough,
+              actions.setUnderline,
+            ]} />
           </View>
 
           <View style={{ flexDirection: 'column' }}>
@@ -1075,7 +1528,7 @@ const Medicalprescription = ({ route, navigation }) => {
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </View> */}
 
 
       </View>
@@ -1113,6 +1566,24 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     height: height * 0.9,
+    width: '100%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  modalContainerother: {
+    flex: 1,
+    padding: 10,
+    // height: height * 0.1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  modalContentother: {
+    height: height * 0.3,
     width: '100%',
     backgroundColor: 'white',
     padding: 20,

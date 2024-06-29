@@ -19,12 +19,18 @@ import moment from 'moment';
 import { height, width } from '../../Authentication/Siigninscreen';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Toast from 'react-native-toast-message';
+import { Calendar } from 'react-native-calendars';
+import { Dropdown } from 'react-native-element-dropdown';
+import Backbutton from '../../Component/Backbutton';
 
 const Doctorsscreen = ({ navigation }) => {
+  const [serviceLocations, setServiceLocations] = useState([]);
+  const [selectedServiceLocation, setSelectedServiceLocation] = useState(serviceLocations[0]?.id || '');
 
   useFocusEffect(
     React.useCallback(() => {
       getslots();
+      Servicelocation();
     }, []),
   );
 
@@ -33,14 +39,15 @@ const Doctorsscreen = ({ navigation }) => {
   const getslots = async () => {
     const access_token = await AsyncStorage.getItem('access_token');
     const bearerToken = access_token;
-
+    console.log(access_token)
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/getAppointmentSlots`;
+      const api = `https://espinarealty.com/doctor/api/v1/getSlots`;
       const authToken = bearerToken;
       const formData = new FormData();
       formData.append('doctor_id', storedoctorid);
+      console.log(formData)
       const response = await fetch(api, {
         method: 'POST',
         headers: {
@@ -55,7 +62,7 @@ const Doctorsscreen = ({ navigation }) => {
           setApiData(responseData.data);
           // setKeys(Object.keys(responseData.data));
 
-          console.log(responseData.data)
+          console.log('gettttttttttttttt', responseData.data)
         } else {
           console.error('Non-200 status code:', response.status);
         }
@@ -91,6 +98,47 @@ const Doctorsscreen = ({ navigation }) => {
     }
   }
 
+
+  const Servicelocation = async () => {
+    const access_token = await AsyncStorage.getItem('access_token');
+    const storedoctorid = await AsyncStorage.getItem('doctor_id');
+    const bearerToken = access_token;
+
+    try {
+      const api = `https://espinarealty.com/doctor/api/v1/getServiceLocations`;
+
+      const authToken = bearerToken;
+      const formData = new FormData();
+
+      formData.append('doctor_id', storedoctorid);
+      console.log('hello', formData);
+
+      const response = await fetch(api, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (response) {
+        if (response.status === 200) {
+          const responseText = await response.text();
+          const responseData = JSON.parse(responseText);
+          console.log('servise', responseData.data);
+          setServiceLocations(responseData.data);
+        } else {
+          console.error('Non-200 status code:', response.status);
+        }
+      } else {
+        console.error('Response is undefined');
+      }
+    } catch (error) {
+      console.error('erorrr', error);
+    }
+  }
+
   const callApi = async (formattedStartTime, formattedEndTime) => {
     const access_token = await AsyncStorage.getItem('access_token');
     const bearerToken = access_token;
@@ -98,7 +146,7 @@ const Doctorsscreen = ({ navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/addAppointmentSlots`;
+      const api = `https://espinarealty.com/doctor/api/v1/addSlot`;
 
       const authToken = bearerToken;
 
@@ -110,7 +158,8 @@ const Doctorsscreen = ({ navigation }) => {
       formData.append('start_time', formattedStartTime);
       formData.append('end_time', formattedEndTime);
       formData.append('max_appointment', maxAppointments);
-      formData.append('weekday', send_day);
+      formData.append('date', calenderdate);
+      formData.append('location_id', selectedServiceLocation);
 
       console.log('hello', formData);
 
@@ -136,15 +185,12 @@ const Doctorsscreen = ({ navigation }) => {
           // setaddslot(responseData.data);
         } else {
           console.error('Non-200 status code:', response.status);
-          setLoading(false);
         }
       } else {
         console.error('Response is undefined');
-        setLoading(false);
       }
     } catch (error) {
       console.error('erorrr', error);
-      setLoading(false);
     }
   };
 
@@ -156,7 +202,7 @@ const Doctorsscreen = ({ navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/editAppointmentSlots`;
+      const api = `https://espinarealty.com/doctor/api/v1/editSlot`;
 
       const authToken = bearerToken;
 
@@ -167,6 +213,7 @@ const Doctorsscreen = ({ navigation }) => {
       formData.append('end_time', formattedEndTim);
       formData.append('max_appointment', editappointment);
       formData.append('slot_id', selectedSlot.id);
+      formData.append('location_id', selectedServiceLocation);
 
       console.log('hello', formData);
 
@@ -188,15 +235,12 @@ const Doctorsscreen = ({ navigation }) => {
           // setaddslot(responseData.data);
         } else {
           console.error('Non-200 status code:', response.status);
-          setLoading(false);
         }
       } else {
         console.error('Response is undefined');
-        setLoading(false);
       }
     } catch (error) {
       console.error('erorrr', error);
-      setLoading(false);
     }
   };
 
@@ -224,6 +268,10 @@ const Doctorsscreen = ({ navigation }) => {
   const [editisEndTimePickerVisible, seteditEndTimePickerVisibility] = useState(false);
   const [editisStartTimePickerVisible, seteditStartTimePickerVisibility] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+
 
   const openModal = () => {
     setModalVisible(true);
@@ -255,38 +303,47 @@ const Doctorsscreen = ({ navigation }) => {
 
   const handleAddAppointmen = (selectedSlot) => {
     const formattedStartTim = moment(editstarttime, 'hh:mm A').format('HH:mm');
-    const formattedEndTim= moment(editenttime, 'hh:mm A').format('HH:mm');
+    const formattedEndTim = moment(editenttime, 'hh:mm A').format('HH:mm');
 
     editapi(formattedStartTim, formattedEndTim);
   };
 
 
+  const renderItem = ({ item }) => {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <View style={{ backgroundColor: '#dbe6f9', borderRadius: 20, padding: 10, width: '65%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text
-          style={{
-            fontSize: 14,
-            fontFamily: 'NunitoSans_7pt-Light',
-            color: '#4e93e1',
+    // Safe access to hospital_title
+    const hospitalTitle = item.location ? item.location.hospital_title : 'No location specified';
+
+    return (
+      <View style={styles.itemContainer}>
+        <View style={{ backgroundColor: '#dbe6f9', borderRadius: 20, padding: 10, width: '75%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontSize: 14, fontFamily: 'NunitoSans_7pt-Light', color: '#4e93e1' }}>
+              {formatDate(item.date)}
+            </Text>
+            <Text>{hospitalTitle}</Text>
+            <Text>{item.start_time}-{item.end_time}</Text>
+          </View>
+
+          <TouchableOpacity onPress={() => handlePress(item)}>
+            <Icon name='closecircle' size={20} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            console.log(item);
+            Editmodal(item);
           }}>
-          {item.time_range}
-        </Text>
-        <TouchableOpacity onPress={() => handlePress(item)}>
-          <Icon name='closecircle' size={20} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => {
-          console.log(item)
-          Editmodal(item)
-        }}>
-          <Icon name='edit' size={20} />
-        </TouchableOpacity>
+            <Icon name='edit' size={20} />
+          </TouchableOpacity>
+        </View>
       </View>
+    );
+  };
 
-    </View>
-  );
 
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
@@ -313,7 +370,7 @@ const Doctorsscreen = ({ navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/deleteAppointmentSlot`;
+      const api = `https://espinarealty.com/doctor/api/v1/deleteSlot`;
       const authToken = bearerToken;
       const formData = new FormData();
       formData.append('slot_id', e.id);
@@ -343,6 +400,11 @@ const Doctorsscreen = ({ navigation }) => {
   const filter = () => {
     navigation.navigate('filter');
   };
+
+  const dropdownData = serviceLocations.map(location => ({
+    label: location.hospital_title,
+    value: location.id,
+  }));
 
   const daynames = (key) => {
     if (key == 1) {
@@ -432,8 +494,24 @@ const Doctorsscreen = ({ navigation }) => {
     seteditendtime(date.toLocaleTimeString());
     hideEndTimePicke();
   };
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
+  const handleDateSelect = async (date) => {
+    console.log(date)
+    setSelectedDate(date);
+    setShowCalendarModal(false);
 
+    setShowCalendarModal(false);
+    if (date) {
+      setSelectedDate(date); // Update to use the selectedDate directly
+      const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+      openModal();
+      setcalenderdate(date)
+      // await callApi(date);
+    }
+  };
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calenderdate, setcalenderdate] = useState('')
   return (
     <View style={{ backgroundColor: 'white', flex: 1 }}>
       <View
@@ -443,21 +521,7 @@ const Doctorsscreen = ({ navigation }) => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{ marginLeft: 10 }}>
-          <TouchableOpacity onPress={handleBackButtonPress}>
-            <Image
-              resizeMode="contain"
-              style={{
-                height: height * 0.02,
-                width: width * 0.04,
-                tintColor: 'white',
-                left: 5,
-              }}
-              source={require('../../Assets/BackButton.png')}></Image>
-          </TouchableOpacity>
-        </TouchableOpacity>
+     <Backbutton/>
         <View
           style={{
             height: height * 0.08,
@@ -478,9 +542,37 @@ const Doctorsscreen = ({ navigation }) => {
       </View>
       <ScrollView>
         <View style={{ margin: 10, alignItems: 'center' }}>
-          <Text style={{ fontSize: 18, fontWeight: '500', color: 'black' }}>Add appointment slots by week days</Text>
+          <Text style={{ fontSize: 18, fontWeight: '500', color: 'black' }}>Add appointment slots</Text>
         </View>
+
         <View>
+
+          <Calendar
+            onDayPress={(day) => handleDateSelect(day.dateString)}
+            markedDates={{
+              [selectedDate]: { selected: true, selectedColor: '#4e93e1' }
+            }}
+          />
+
+
+          {/* <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showCalendarModal}
+        onRequestClose={() => setShowCalendarModal(false)}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+ 
+
+<Calendar
+            onDayPress={(day) => handleDateSelect(day.dateString)}
+            markedDates={{
+              [selectedDate]: { selected: true, selectedColor: 'blue' }
+            }}
+          />
+        </View>
+      </Modal> */}
+        </View>
+        {/* <View>
           <FlatList
             data={keys}
             renderItem={({ item: key }) => (
@@ -539,7 +631,13 @@ const Doctorsscreen = ({ navigation }) => {
               </View>
             )}
           />
-        </View>
+        </View> */}
+
+        <FlatList
+          data={apiData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
 
         <Modal
           transparent={true}
@@ -548,7 +646,7 @@ const Doctorsscreen = ({ navigation }) => {
           onRequestClose={cancelmodal}>
           <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center' }}>
             <View style={{
-              height: height * 0.50,
+              height: height * 0.55,
               width: '90%',
               backgroundColor: 'white',
               padding: 20,
@@ -559,6 +657,41 @@ const Doctorsscreen = ({ navigation }) => {
 
               <Text style={{ fontSize: 16, color: 'black', margin: 10 }}>Maximum Appointment </Text>
               <View style={{ backgroundColor: '#f9f9f9' }}>
+
+                {/* <Picker
+                  selectedValue={selectedServiceLocation}
+                  onValueChange={(itemValue, itemIndex) => {
+                    console.log("Selected Value:", itemValue);
+                    setSelectedServiceLocation(itemValue);
+                  }}
+                >
+                  {serviceLocations.map(location => (
+                    <Picker.Item key={location.id} label={location.hospital_title} value={location.id} />
+                  ))}
+                </Picker> */}
+                <Dropdown
+                  style={[{ height: 40, margin: 10 }, isFocus && { borderColor: 'blue', height: 50 }]}
+                  placeholderStyle={{ color: 'black' }}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={dropdownData}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? 'Select item' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedServiceLocation}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(item) => {
+                    setSelectedServiceLocation(item.value);
+                    setIsFocus(false);
+                    console.log("Selected Value:", item.value);
+                  }}
+                />
+
 
                 <Picker
                   style={{ backgroundColor: '#f9f9f9', }}
@@ -646,7 +779,7 @@ const Doctorsscreen = ({ navigation }) => {
           onRequestClose={closeModal}>
           <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center' }}>
             <View style={{
-              height: height * 0.50,
+              height: height * 0.57,
               width: '90%',
               backgroundColor: 'white',
               padding: 13,
@@ -654,7 +787,56 @@ const Doctorsscreen = ({ navigation }) => {
               elevation: 5,
             }}>
               <Text style={{ color: '#4e93e1', fontSize: 18, fontWeight: '500', margin: 10 }}>Add Slot ({dayname})</Text>
+              <Text style={{ fontSize: 16, color: 'black', margin: 10 }}>Service Location</Text>
+              <View style={{ backgroundColor: '#f9f9f9' }}>
+                {/* <Picker
+                selectedValue={selectedServiceLocation}
+                // onValueChange={(itemValue, itemIndex) => setSelectedServiceLocation(itemValue)}
+                >
+                {serviceLocations.map(location => (
+                  <Picker.Item key={location.id} label={location.hospital_title} value={location.id} />
+                ))}
+              </Picker> */}
 
+                {/* <Picker
+                  style={{ backgroundColor: '#f9f9f9' }}
+                  selectedValue={selectedServiceLocation}
+                  onValueChange={(itemValue, itemIndex) => {
+                    console.log("Selected Value:", itemValue);
+                    setSelectedServiceLocation(itemValue);
+                  }}
+                >
+                  {serviceLocations.map(location => (
+                    <Picker.Item key={location.id} label={location.hospital_title} value={location.id} />
+                  ))}
+                </Picker> */}
+
+
+                <Dropdown
+                  style={[{ height: 40, margin: 10 }, isFocus && { borderColor: 'blue', height: 50 }]}
+                  placeholderStyle={{ color: 'black' }}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={dropdownData}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? 'Select item' : '...'}
+                  searchPlaceholder="Search..."
+                  value={selectedServiceLocation}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(item) => {
+                    setSelectedServiceLocation(item.value);
+                    setIsFocus(false);
+                    console.log("Selected Value:", item.value);
+                  }}
+                />
+
+
+              </View>
               <Text style={{ fontSize: 16, color: 'black', margin: 10 }}>Maximum Appointment</Text>
               <View style={{ backgroundColor: '#f9f9f9' }}>
 

@@ -29,7 +29,7 @@ const Labrequest = ({ navigation, route }) => {
                     redirect: "follow"
                 };
 
-                const response = await fetch("http://teleforceglobal.com/doctor/api/v1/labRequestForm", requestOptions);
+                const response = await fetch("https://espinarealty.com/doctor/api/v1/labRequestForm", requestOptions);
                 if (response.ok) {
                     const result = await response.json();
                     setLabData(result);
@@ -50,7 +50,7 @@ const Labrequest = ({ navigation, route }) => {
             const authToken = access_token;
 
             try {
-                const api = 'http://teleforceglobal.com/doctor/api/v1/getLabRequest';
+                const api = 'https://espinarealty.com/doctor/api/v1/getLabRequest';
                 const requestOptions = {
                     method: 'POST',
                     headers: {
@@ -103,7 +103,7 @@ const Labrequest = ({ navigation, route }) => {
         const bearerToken = access_token;
 
         try {
-            const api = `http://teleforceglobal.com/doctor/api/v1/addLabRequest`;
+            const api = `https://espinarealty.com/doctor/api/v1/addLabRequest`;
             const authToken = bearerToken;
             const formData = new FormData();
 
@@ -158,7 +158,7 @@ const Labrequest = ({ navigation, route }) => {
         const bearerToken = access_token;
 
         try {
-            const api = `http://teleforceglobal.com/doctor/api/v1/editLabRequest`;
+            const api = `https://espinarealty.com/doctor/api/v1/editLabRequest`;
             const authToken = bearerToken;
             const formData = new FormData();
 
@@ -232,7 +232,7 @@ const Labrequest = ({ navigation, route }) => {
 
     const Printlabrequest = async () => {
         try {
-            const apiUrl = 'http://teleforceglobal.com/doctor/api/v1/printLabRequest';
+            const apiUrl = 'https://espinarealty.com/doctor/api/v1/printLabRequest';
             const access_token = await AsyncStorage.getItem('access_token');
             console.log(access_token)
             const authToken = access_token;
@@ -288,7 +288,7 @@ const Labrequest = ({ navigation, route }) => {
         const bearerToken = access_token;
 
         try {
-            const api = `http://teleforceglobal.com/doctor/api/v1/deleteLabRequest`;
+            const api = `https://espinarealty.com/doctor/api/v1/deleteLabRequest`;
             const authToken = bearerToken;
             const formData = new FormData();
 

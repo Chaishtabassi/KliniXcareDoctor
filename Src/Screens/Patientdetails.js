@@ -23,6 +23,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import { CheckBox } from 'react-native-elements';
 import { Calendar } from 'react-native-calendars';
+import Backbutton from '../Component/Backbutton';
 
 const Patientdetails = ({ route, navigation }) => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -82,6 +83,7 @@ const Patientdetails = ({ route, navigation }) => {
   };
 
   const selectedpatient = route.params ? route.params.selectedpatient : null;
+  console.log(selectedpatient)
 
   useFocusEffect(
     React.useCallback(() => {
@@ -110,7 +112,7 @@ const Patientdetails = ({ route, navigation }) => {
         const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
         try {
-          const api = `http://teleforceglobal.com/doctor/api/v1/getDotors`;
+          const api = `https://espinarealty.com/doctor/api/v1/getDotors`;
           const authToken = bearerToken;
           const formData = new FormData();
 
@@ -160,7 +162,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/referTo`;
+      const api = `https://espinarealty.com/doctor/api/v1/referTo`;
       const authToken = bearerToken;
       const formData = new FormData();
 
@@ -263,7 +265,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/rescheduleAppointmentByDoctor`;
+      const api = `https://espinarealty.com/doctor/api/v1/rescheduleAppointmentByDoctor`;
       const authToken = bearerToken;
       const formData = new FormData();
 
@@ -315,7 +317,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/fetchDoctorSlotsByDate`;
+      const api = `https://espinarealty.com/doctor/api/v1/getSlotsByDate`;
       const authToken = bearerToken;
       const formData = new FormData();
 
@@ -336,7 +338,7 @@ const Patientdetails = ({ route, navigation }) => {
         if (response.status === 200) {
           const responseText = await response.text();
           const responseData = JSON.parse(responseText);
-          console.log(responseText);
+          console.log('slotessssssssssssssssssssssss',responseText);
           setModalVisib(true);
           setSlots(responseData.data);
         }
@@ -353,7 +355,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/declineAppointment`;
+      const api = `https://espinarealty.com/doctor/api/v1/declineAppointment`;
       const authToken = bearerToken;
       const formData = new FormData();
 
@@ -406,7 +408,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/completeAppointment`;
+      const api = `https://espinarealty.com/doctor/api/v1/completeAppointment`;
       const authToken = bearerToken;
 
       const formData = new FormData();
@@ -459,7 +461,7 @@ const Patientdetails = ({ route, navigation }) => {
     const bearerToken = access_token;
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/addAdditionalCharges`;
+      const api = `https://espinarealty.com/doctor/api/v1/addAdditionalCharges`;
       const authToken = bearerToken;
       console.log('API acceptAppointment');
       const formData = new FormData();
@@ -495,7 +497,7 @@ const Patientdetails = ({ route, navigation }) => {
     const bearerToken = access_token;
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/addDiscountAmount`;
+      const api = `https://espinarealty.com/doctor/api/v1/addDiscountAmount`;
       const authToken = bearerToken;
       console.log('API acceptAppointment');
       const formData = new FormData();
@@ -533,7 +535,7 @@ const Patientdetails = ({ route, navigation }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/acceptAppointment`;
+      const api = `https://espinarealty.com/doctor/api/v1/acceptAppointment`;
       const authToken = bearerToken;
       console.log('API acceptAppointment');
       const formData = new FormData();
@@ -595,7 +597,6 @@ const Patientdetails = ({ route, navigation }) => {
     console.log(date)
     setSelectedDate(date);
     setShowCalendarModal(false);
-    // You can perform additional actions here with the selected date
 
     setShowCalendarModal(false);
     if (date) {
@@ -619,17 +620,7 @@ const Patientdetails = ({ route, navigation }) => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity onPress={handleBackButtonPress}>
-          <Image
-            resizeMode="contain"
-            style={{
-              height: height * 0.02,
-              width: width * 0.04,
-              tintColor: 'white',
-              left: 10,
-            }}
-            source={require('../Assets/BackButton.png')}></Image>
-        </TouchableOpacity>
+       <Backbutton/>
         <View style={{ flex: 1, alignItems: 'center' }}>
           <Text
             style={{
@@ -975,7 +966,7 @@ const Patientdetails = ({ route, navigation }) => {
         </Modal>
 
         <Modal
-          animationType="slide" // Slide animation from bottom to top
+          animationType="slide" 
           transparent={true}
           visible={ModalVisible}>
           <View style={styles.modalContainer}>
@@ -1169,7 +1160,7 @@ const Patientdetails = ({ route, navigation }) => {
                                   : { color: 'black' },
                               ]}
                             >
-                              {item.time_range}
+                              {item.start_time}-{item.end_time}
                             </Text>
                             {item.is_break === '1' && (
                               <Text style={{ fontSize: 12, color: 'red' }}>

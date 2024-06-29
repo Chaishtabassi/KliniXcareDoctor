@@ -54,7 +54,7 @@ const Pinscreen = ({navigation}) => {
   
     if (enteredPin && enteredPin.length === 4) {
       try {
-        const apiUrl = `http://teleforceglobal.com/doctor/api/v1/doctorLogin`;
+        const apiUrl = `https://espinarealty.com/doctor/api/v1/doctorLogin`;
   
         const formData = new FormData();
   
@@ -181,8 +181,9 @@ const Pinscreen = ({navigation}) => {
                 color: '#4a87d7',
                 fontWeight: '500',
                 fontFamily: 'NunitoSans_7pt-Regular',
+                marginLeft:5
               }}>
-              Reset
+               Reset
             </Text>
           </TouchableOpacity>
         </View>

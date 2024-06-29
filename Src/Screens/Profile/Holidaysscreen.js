@@ -20,8 +20,9 @@ import {
   import DateTimePicker from '@react-native-community/datetimepicker';
   import Toast from 'react-native-toast-message';
 import { Calendar } from 'react-native-calendars';
+import Backbutton from '../../Component/Backbutton';
 
-const Holidaysscreen = () => {
+const Holidaysscreen = ({navigation}) => {
     const [holidaysData, setHolidaysData] = useState([]);
     const [showCalendarModal, setShowCalendarModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -68,7 +69,7 @@ const Holidaysscreen = () => {
         const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
         try {
-            const api = `http://teleforceglobal.com/doctor/api/v1/addHoliday`;
+            const api = `https://espinarealty.com/doctor/api/v1/addHoliday`;
             const authToken = bearerToken;
             const formData = new FormData();
             formData.append('doctor_id', storedoctorid);
@@ -106,7 +107,7 @@ const Holidaysscreen = () => {
         const storedoctorid = await AsyncStorage.getItem('doctor_id');
     
         try {
-          const api = `http://teleforceglobal.com/doctor/api/v1/getHolidays`;
+          const api = `https://espinarealty.com/doctor/api/v1/getHolidays`;
           const authToken = bearerToken;
           const formData = new FormData();
           formData.append('doctor_id', storedoctorid);
@@ -145,7 +146,7 @@ const Holidaysscreen = () => {
         const storedoctorid = await AsyncStorage.getItem('doctor_id');
     
         try {
-          const api = `http://teleforceglobal.com/doctor/api/v1/deleteHoliday`;
+          const api = `https://espinarealty.com/doctor/api/v1/deleteHoliday`;
           const authToken = bearerToken;
           const formData = new FormData();
           formData.append('holiday_id', id);
@@ -193,21 +194,7 @@ const Holidaysscreen = () => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{marginLeft: 10}}>
-          <TouchableOpacity onPress={handleBackButtonPress}>
-            <Image
-              resizeMode="contain"
-              style={{
-                height: height * 0.02,
-                width: width * 0.04,
-                tintColor: 'white',
-                left: 5,
-              }}
-              source={require('../../Assets/BackButton.png')}></Image>
-          </TouchableOpacity>
-        </TouchableOpacity>
+       <Backbutton/>
         <View
           style={{
             height: height * 0.08,

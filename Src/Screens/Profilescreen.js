@@ -57,7 +57,7 @@ const Profilescreen = ({navigation}) => {
     console.log(bearerToken);
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/doctor-info`;
+      const api = `https://espinarealty.com/doctor/api/v1/doctor-info`;
 
       const authToken = bearerToken;
 
@@ -97,10 +97,10 @@ const Profilescreen = ({navigation}) => {
         </View>
 
         <View style={styles.profileContainer}>
-          <Image
+          {/* <Image
             source={require('../Assets/photo.png')}
             style={styles.profileImage}
-          />
+          /> */}
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{apiData.name}</Text>
             <Text style={styles.name}>{apiData.designation}</Text>
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    height: height * 0.2,
+    height: height * 0.1,
     justifyContent: 'center',
   },
   profileImage: {

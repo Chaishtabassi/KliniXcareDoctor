@@ -27,7 +27,7 @@ const Drawernavigation = ({navigation, visible, onClose }) => {
      console.log(bearerToken);
  
      try {
-       const api = `http://teleforceglobal.com/doctor/api/v1/doctor-info`;
+       const api = `https://espinarealty.com/doctor/api/v1/doctor-info`;
  
        const authToken = bearerToken;
  

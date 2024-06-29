@@ -8,8 +8,9 @@ import {
   Image,
 } from 'react-native';
 import {height, width} from '../../Authentication/Siigninscreen';
+import Backbutton from '../../Component/Backbutton';
 
-const Faqscreen = () => {
+const Faqscreen = ({navigation}) => {
   const faqData = [
     {
       //1
@@ -90,21 +91,7 @@ const Faqscreen = () => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{marginLeft: 10}}>
-          <TouchableOpacity onPress={handleBackButtonPress}>
-            <Image
-              resizeMode="contain"
-              style={{
-                height: height * 0.02,
-                width: width * 0.04,
-                tintColor: 'white',
-                left: 5,
-              }}
-              source={require('../../Assets/BackButton.png')}></Image>
-          </TouchableOpacity>
-        </TouchableOpacity>
+      <Backbutton/>
         <View
           style={{
             height: height * 0.08,

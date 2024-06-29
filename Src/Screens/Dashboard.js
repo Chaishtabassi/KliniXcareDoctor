@@ -34,17 +34,19 @@ const Dashboard = ({ navigation, route }) => {
           onPress: () => null,
           style: 'cancel',
         },
-        {text: 'YES', onPress: () => BackHandler.exitApp()},
+        { text: 'YES', onPress: () => BackHandler.exitApp() },
       ]);
       return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+    if (isFocused) {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
 
-    return () => backHandler.remove();
+      return () => backHandler.remove();
+    }
   }, [isFocused]);
 
   useFocusEffect(
@@ -65,7 +67,7 @@ const Dashboard = ({ navigation, route }) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/fetchAppointmentHistory`;
+      const api = `https://espinarealty.com/doctor/api/v1/fetchAppointmentHistory`;
 
       const authToken = bearerToken;
 
@@ -129,7 +131,7 @@ const Dashboard = ({ navigation, route }) => {
     const bearerToken = access_token;
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/fetchAppointmentHistory`;
+      const api = `https://espinarealty.com/doctor/api/v1/fetchAppointmentHistory`;
 
       const authToken = bearerToken;
 
@@ -190,7 +192,7 @@ const Dashboard = ({ navigation, route }) => {
       console.log(bearerToken);
 
       try {
-        const api = `http://teleforceglobal.com/doctor/api/v1/doctor-info`;
+        const api = `https://espinarealty.com/doctor/api/v1/doctor-info`;
 
         const authToken = bearerToken;
 
@@ -453,7 +455,7 @@ const Dashboard = ({ navigation, route }) => {
 <View style={{borderBottomRightRadius:30,borderBottomLeftRadius:30,backgroundColor:'#4a87d7',padding:20}}>
             <View style={{}}>
               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-            <Text style={{fontSize:20,fontWeight:'700',color:'white'}}>Hello, {doctordetail.name}</Text>
+            <Text style={{fontSize:20,fontWeight:'700',color:'white',width:'60%'}}>Hello, {doctordetail.name}</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
             <TouchableOpacity onPress={profile} style={{marginRight:10}}>
             <Image style={{height:30,width:30}} source={require('../Assets/bottomprofile.png')}/>
@@ -484,7 +486,7 @@ const Dashboard = ({ navigation, route }) => {
           </View>
 
 <ScrollView>
-          <View style={{ marginTop: 15 }}>
+          <View style={{ marginTop: 10 }}>
             <Text style={styles.bottomText}>Today's Appointments</Text>
 
             {apiData.length === 0 ? (
@@ -501,6 +503,7 @@ const Dashboard = ({ navigation, route }) => {
                 />
               </View>
             ) : (
+              <View style={{}}>
               <FlatList
                 data={apiData}
                 renderItem={renderItem}
@@ -511,6 +514,7 @@ const Dashboard = ({ navigation, route }) => {
                 }}
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
               />
+              </View>
             )}
             
           </View>
@@ -578,6 +582,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5, // For Android shadow
     margin: 10,
+    bottom:20,
   },
   imageContainer: {
     // marginBottom: 5,
@@ -604,6 +609,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     fontFamily: 'Domine-Bold',
     marginLeft: 12,
+    bottom:4
   },
   bottomText1: {
     fontSize: 18,

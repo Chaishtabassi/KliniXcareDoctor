@@ -13,8 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { height } from '../../Authentication/Siigninscreen'
+import Backbutton from '../../Component/Backbutton';
 
-const Personalinfoscreen = ({navigation}) => {
+const Personalinfoscreen = ({ navigation }) => {
   const handleBackButtonPress = () => {
     navigation.goBack();
   };
@@ -27,6 +28,7 @@ const Personalinfoscreen = ({navigation}) => {
   const [Degree, setDegree] = useState('');
   const [Hospital, sethospital] = useState('');
   const [Modelvisible2, setModelvisible2] = useState(false);
+  const [servicelocation, setservicelocation] = useState([])
 
   const Model = () => {
     setModalVisible(!ModalVisible);
@@ -46,8 +48,49 @@ const Personalinfoscreen = ({navigation}) => {
   useFocusEffect(
     React.useCallback(() => {
       Doctordetail();
+      Servicelocation();
     }, []),
   );
+
+  const Servicelocation = async () => {
+    const access_token = await AsyncStorage.getItem('access_token');
+    const storedoctorid = await AsyncStorage.getItem('doctor_id');
+    const bearerToken = access_token;
+
+    try {
+      const api = `https://espinarealty.com/doctor/api/v1/getServiceLocations`;
+
+      const authToken = bearerToken;
+      const formData = new FormData();
+
+      formData.append('doctor_id', storedoctorid);
+      console.log('hello', formData);
+
+      const response = await fetch(api, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (response) {
+        if (response.status === 200) {
+          const responseText = await response.text();
+          const responseData = JSON.parse(responseText);
+          console.log('servise', responseData.data);
+          setservicelocation(responseData.data)
+        } else {
+          console.error('Non-200 status code:', response.status);
+        }
+      } else {
+        console.error('Response is undefined');
+      }
+    } catch (error) {
+      console.error('erorrr', error);
+    }
+  }
 
   const Doctoredit = async () => {
     const access_token = await AsyncStorage.getItem('access_token');
@@ -55,7 +98,7 @@ const Personalinfoscreen = ({navigation}) => {
     const bearerToken = access_token;
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/updateDoctorDetails`;
+      const api = `https://espinarealty.com/doctor/api/v1/updateDoctorDetails`;
 
       const authToken = bearerToken;
       const formData = new FormData();
@@ -69,10 +112,10 @@ const Personalinfoscreen = ({navigation}) => {
       formData.append('designation', doctordetail.designation);
       formData.append('degrees', doctordetail.degrees);
       formData.append('languages_spoken', doctordetail.languages_spoken);
-    formData.append('experience_year', doctordetail.experience_year);
-    formData.append('consultation_fee', doctordetail.consultation_fee);
-    formData.append('about_youself', Hospital);
-    formData.append('educational_journey', education);
+      formData.append('experience_year', doctordetail.experience_year);
+      formData.append('consultation_fee', doctordetail.consultation_fee);
+      formData.append('about_youself', Hospital);
+      formData.append('educational_journey', education);
       formData.append('online_consultation', doctordetail.online_consultation);
       formData.append('clinic_consultation', doctordetail.clinic_consultation);
 
@@ -124,7 +167,7 @@ const Personalinfoscreen = ({navigation}) => {
     console.log(bearerToken);
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/doctor-info`;
+      const api = `https://espinarealty.com/doctor/api/v1/doctor-info`;
 
       const authToken = bearerToken;
 
@@ -168,7 +211,8 @@ const Personalinfoscreen = ({navigation}) => {
           backgroundColor: '#4e93e1',
           height: '7%',
         }}>
-        <TouchableOpacity
+        <Backbutton />
+        {/* <TouchableOpacity
           onPress={handleBackButtonPress}
           style={{ marginLeft: 10 }}>
             <Image
@@ -180,7 +224,7 @@ const Personalinfoscreen = ({navigation}) => {
                 left: 5,
               }}
               source={require('../../Assets/BackButton.png')}></Image>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View
           style={{
             height: height * 0.08,
@@ -200,27 +244,27 @@ const Personalinfoscreen = ({navigation}) => {
         </View>
       </View>
       <View style={styles.profileContainer}>
-        <Image
+        {/* <Image
           source={require('../../Assets/photo.png')}
           style={styles.profileImage}
-        />
-        <View>
+        /> */}
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>{doctordetail.name}</Text>
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#4e93e1' }}>{doctordetail.designation}</Text>
         </View>
 
       </View>
 
-      <View style={{ margin: 10, justifyContent: 'space-between', height: '27%' }}>
+      <View style={{ margin: 10, justifyContent: 'space-between', height: '20%' }}>
         <View style={{ backgroundColor: '#f8f8f8', padding: 10, flexDirection: 'row', alignItems: 'center' }}>
           <Icon name='call' color='#4e93e1' size={15} />
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#9c9c9c' }}>  {doctordetail.mobile_number}</Text>
         </View>
 
-        <View style={{ backgroundColor: '#f8f8f8', padding: 10, flexDirection: 'row', alignItems: 'center' }}>
+        {/* <View style={{ backgroundColor: '#f8f8f8', padding: 10, flexDirection: 'row', alignItems: 'center' }}>
           <Icon name='mail' color='#4e93e1' size={15} />
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#9c9c9c' }}>  Jasmine@gmail.coom</Text>
-        </View>
+        </View> */}
 
         <View style={{ backgroundColor: '#f8f8f8', padding: 10, flexDirection: 'row', alignItems: 'center' }}>
           <Icon name='bag' color='#4e93e1' size={15} />
@@ -228,13 +272,14 @@ const Personalinfoscreen = ({navigation}) => {
         </View>
 
         <View style={{ backgroundColor: '#f8f8f8', padding: 10, flexDirection: 'row', alignItems: 'center' }}>
-          <Image source={require('../../Assets/rupee.png')} />
+          {/* <Image source={require('../../Assets/rupee.png')} /> */}
+          <Image source={require('../../Assets/paisosign.png')} style={{ height: 17, width: 17 }} />
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#9c9c9c' }}>  {doctordetail.consultation_fee}</Text>
         </View>
       </View>
 
 
-      <View style={{ margin: 10 }}>
+      <View style={{ margin: 10, justifyContent: 'space-between', flexDirection: 'column', height: '60%' }}>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>About</Text>
@@ -248,6 +293,17 @@ const Personalinfoscreen = ({navigation}) => {
         </View>
 
         <Text>{doctordetail.about_youself}</Text>
+
+        {servicelocation.map((location, index) => (
+          <View key={index} style={{}}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>Location {index + 1}</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text>{location.hospital_title}</Text>
+              <Text>, {location.hospital_address}</Text>
+            </View>
+          </View>
+        ))}
+
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>Educational Journey</Text>
@@ -511,7 +567,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   profileContainer: {
-    flexDirection: 'row',
+    // flexDirection: 'row',
     alignItems: 'center',
     margin: 10,
   },

@@ -14,7 +14,7 @@ const Logoutscreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Image source={require('../../Assets/logout.png')} style={styles.image} />
+        {/* <Image source={require('../../Assets/logout.png')} style={styles.image} /> */}
         <Text style={styles.heading}>Are you sure you want to Sign Out ?</Text>
       </View>
 

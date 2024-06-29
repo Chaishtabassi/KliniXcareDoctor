@@ -46,7 +46,7 @@ const Messagepatient = ({route}) => {
         const storedoctorid = await AsyncStorage.getItem('doctorid');
         const bearerToken = access_token;
   
-        const api = 'http://teleforceglobal.com/doctor/api/storeChat';
+        const api = 'https://espinarealty.com/doctor/api/storeChat';
   
         const authToken = bearerToken;
   
@@ -93,7 +93,7 @@ const Messagepatient = ({route}) => {
         console.log(storedoctorid)
         const bearerToken = access_token;
     
-        const api = 'http://teleforceglobal.com/doctor/api/getChats';
+        const api = 'https://espinarealty.com/doctor/api/getChats';
     
         const authToken = bearerToken;
     

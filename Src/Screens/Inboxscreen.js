@@ -20,7 +20,7 @@ const Inboxscreen = ({navigation}) => {
 
       console.log(access_token)
   
-      const api = 'http://teleforceglobal.com/doctor/api/v1/fetchPatientsWithLastChat';
+      const api = 'https://espinarealty.com/doctor/api/v1/fetchPatientsWithLastChat';
   
       const authToken = bearerToken;
   

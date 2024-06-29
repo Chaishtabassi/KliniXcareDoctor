@@ -40,7 +40,7 @@ const Requestscreen = ({navigation}) => {
     const storedoctorid = await AsyncStorage.getItem('doctor_id');
 
     try {
-      const api = `http://teleforceglobal.com/doctor/api/v1/fetchAppointmentHistory`;
+      const api = `https://espinarealty.com/doctor/api/v1/fetchAppointmentHistory`;
 
       const authToken = bearerToken;
 
